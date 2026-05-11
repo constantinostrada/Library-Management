@@ -1,0 +1,76 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// Prisma Schema — Library Management
+// This is the single source of truth for the database structure.
+// Run `npm run db:generate` after any change to regenerate the Prisma client.
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Book ─────────────────────────────────────────────────────────────────────
+
+model Book {
+  id          String   @id @default(uuid())
+  isbn        String   @unique
+  title       String
+  author      String
+  publisher   String
+  publishedAt DateTime
+  totalCopies Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  loans Loan[]
+
+  @@map("books")
+}
+
+// ── Member ────────────────────────────────────────────────────────────────────
+
+model Member {
+  id        String       @id @default(uuid())
+  email     String       @unique
+  name      String
+  status    MemberStatus @default(ACTIVE)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  loans Loan[]
+
+  @@map("members")
+}
+
+enum MemberStatus {
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+// ── Loan ─────────────────────────────────────────────────────────────────────
+
+model Loan {
+  id         String     @id @default(uuid())
+  bookId     String
+  memberId   String
+  borrowedAt DateTime   @default(now())
+  dueAt      DateTime
+  returnedAt DateTime?
+  status     LoanStatus @default(ACTIVE)
+
+  book   Book   @relation(fields: [bookId], references: [id])
+  member Member @relation(fields: [memberId], references: [id])
+
+  @@map("loans")
+}
+
+enum LoanStatus {
+  ACTIVE
+  RETURNED
+  OVERDUE
+}

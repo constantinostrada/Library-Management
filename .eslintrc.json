@@ -1,0 +1,90 @@
+{
+  "root": true,
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "."
+  },
+  "plugins": ["@typescript-eslint", "import"],
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "project": "./tsconfig.json"
+      }
+    }
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/no-floating-promises": "error",
+    "@typescript-eslint/await-thenable": "error",
+    "@typescript-eslint/no-misused-promises": "error",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          ["parent", "sibling", "index"]
+        ],
+        "pathGroups": [
+          { "pattern": "@/domain/**", "group": "internal", "position": "before" },
+          { "pattern": "@/application/**", "group": "internal", "position": "before" },
+          { "pattern": "@/infrastructure/**", "group": "internal" },
+          { "pattern": "@/interfaces/**", "group": "internal" }
+        ],
+        "newlines-between": "always",
+        "alphabetize": { "order": "asc", "caseInsensitive": true }
+      }
+    ],
+    "import/no-cycle": "error",
+    "import/no-restricted-paths": [
+      "error",
+      {
+        "zones": [
+          {
+            "target": "./src/domain",
+            "from": "./src/application",
+            "message": "Domain must not import from Application layer."
+          },
+          {
+            "target": "./src/domain",
+            "from": "./src/infrastructure",
+            "message": "Domain must not import from Infrastructure layer."
+          },
+          {
+            "target": "./src/domain",
+            "from": "./src/interfaces",
+            "message": "Domain must not import from Interfaces layer."
+          },
+          {
+            "target": "./src/application",
+            "from": "./src/infrastructure",
+            "message": "Application must not import from Infrastructure layer."
+          },
+          {
+            "target": "./src/application",
+            "from": "./src/interfaces",
+            "message": "Application must not import from Interfaces layer."
+          },
+          {
+            "target": "./src/infrastructure",
+            "from": "./src/interfaces",
+            "message": "Infrastructure must not import from Interfaces layer."
+          }
+        ]
+      }
+    ],
+    "no-console": ["warn", { "allow": ["warn", "error"] }]
+  }
+}
