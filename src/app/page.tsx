@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { TailwindTest } from '@/components/TailwindTest';
+
 export const metadata: Metadata = {
   title: 'Dashboard',
 };
@@ -37,6 +39,9 @@ export default function HomePage(): JSX.Element {
 
   return (
     <div className="space-y-10">
+      {/* ── Tailwind smoke test component ─────────────────────────────────── */}
+      <TailwindTest />
+
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="text-center py-12">
         <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
