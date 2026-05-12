@@ -29,20 +29,6 @@ const makeBook = (overrides: Partial<Parameters<typeof Book.create>[0]> = {}): B
 const makeMember = (): Member =>
   Member.create({ id: 'member-1', email: 'alice@example.com', name: 'Alice' });
 
-function makeFutureDueDate(): Date {
-  const d = new Date();
-  d.setDate(d.getDate() + 14);
-  return d;
-}
-
-const makeLoan = (): Loan =>
-  Loan.create({
-    id: 'loan-1',
-    bookId: 'book-1',
-    memberId: 'member-1',
-    dueAt: makeFutureDueDate(),
-  });
-
 function makeBookRepo(book: Book | null = makeBook()): jest.Mocked<IBookRepository> {
   return {
     findById: jest.fn().mockResolvedValue(book),
@@ -67,7 +53,6 @@ function makeMemberRepo(member: Member | null = makeMember()): jest.Mocked<IMemb
 }
 
 function makeLoanRepo(): jest.Mocked<ILoanRepository> {
-  const loan = makeLoan();
   return {
     findById: jest.fn(),
     findActiveLoansByMemberId: jest.fn().mockResolvedValue([]),
@@ -75,7 +60,8 @@ function makeLoanRepo(): jest.Mocked<ILoanRepository> {
     findLoansByBookId: jest.fn(),
     findOverdueLoans: jest.fn(),
     findAll: jest.fn(),
-    create: jest.fn().mockResolvedValue(loan),
+    // Echo the loan back so dueAt reflects what the use case actually built.
+    create: jest.fn().mockImplementation((l: Loan) => Promise.resolve(l)),
     update: jest.fn(),
   } as jest.Mocked<ILoanRepository>;
 }

@@ -1,6 +1,24 @@
 import { Loan } from '../entities/Loan';
 
 /**
+ * Logical loan status filter used by ILoanRepository.findAll.
+ *
+ *  - active   = currently borrowed AND not overdue (dueAt >= now)
+ *  - returned = already returned
+ *  - overdue  = not returned AND dueAt < now (whether status is ACTIVE or OVERDUE)
+ */
+export type LoanStatusFilter = 'active' | 'returned' | 'overdue';
+
+export interface ListLoansCriteria {
+  page: number;
+  limit: number;
+  memberId?: string;
+  status?: LoanStatusFilter;
+  /** Reference date for overdue computation. Defaults to the implementation's now. */
+  now?: Date;
+}
+
+/**
  * Repository Interface: ILoanRepository
  *
  * Defines the persistence contract for loan records.
@@ -22,11 +40,10 @@ export interface ILoanRepository {
   findOverdueLoans(): Promise<Loan[]>;
 
   /**
-   * Returns a paginated list of all loans.
-   * @param page  1-based page number.
-   * @param limit Items per page.
+   * Returns a paginated list of loans, optionally filtered by member and/or logical status.
+   * Pagination is 1-based.
    */
-  findAll(page: number, limit: number): Promise<{ loans: Loan[]; total: number }>;
+  findAll(criteria: ListLoansCriteria): Promise<{ loans: Loan[]; total: number }>;
 
   /** Persists a new loan record. Returns the created loan. */
   create(loan: Loan): Promise<Loan>;

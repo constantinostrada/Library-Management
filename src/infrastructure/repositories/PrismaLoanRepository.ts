@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 
 import { Loan, LoanStatus } from '@/domain/entities/Loan';
-import { ILoanRepository } from '@/domain/repositories/ILoanRepository';
+import { ILoanRepository, ListLoansCriteria } from '@/domain/repositories/ILoanRepository';
 
 /**
  * Infrastructure: PrismaLoanRepository
@@ -55,16 +55,36 @@ export class PrismaLoanRepository implements ILoanRepository {
     return rows.map((r) => this.toDomain(r));
   }
 
-  async findAll(page: number, limit: number): Promise<{ loans: Loan[]; total: number }> {
+  async findAll(criteria: ListLoansCriteria): Promise<{ loans: Loan[]; total: number }> {
+    const { page, limit, memberId, status } = criteria;
+    const now = criteria.now ?? new Date();
     const skip = (page - 1) * limit;
+
+    const where: Prisma.LoanWhereInput = {};
+    if (memberId) where.memberId = memberId;
+
+    if (status === 'active') {
+      // Currently borrowed and not overdue.
+      where.status = 'ACTIVE';
+      where.dueAt = { gte: now };
+    } else if (status === 'returned') {
+      where.status = 'RETURNED';
+    } else if (status === 'overdue') {
+      // Either explicitly marked OVERDUE or still ACTIVE but past dueAt.
+      where.OR = [
+        { status: 'OVERDUE' },
+        { status: 'ACTIVE', dueAt: { lt: now } },
+      ];
+    }
 
     const [rows, total] = await this.db.$transaction([
       this.db.loan.findMany({
+        where,
         skip,
         take: limit,
         orderBy: { borrowedAt: 'desc' },
       }),
-      this.db.loan.count(),
+      this.db.loan.count({ where }),
     ]);
 
     return { loans: rows.map((r) => this.toDomain(r)), total };
