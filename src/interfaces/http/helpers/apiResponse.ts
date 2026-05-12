@@ -41,6 +41,7 @@ export function handleError(error: unknown): NextResponse {
       LOAN_ALREADY_RETURNED: 409,
       DUPLICATE_ISBN: 409,
       EMAIL_ALREADY_REGISTERED: 409,
+      BOOK_HAS_ACTIVE_LOANS: 409,
       INVALID_ISBN: 422,
       INVALID_EMAIL: 422,
       INVALID_LOAN_DURATION: 422,

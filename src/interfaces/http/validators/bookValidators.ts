@@ -24,5 +24,19 @@ export const updateBookSchema = z.object({
   totalCopies: z.number().int().min(1).max(10000).optional(),
 });
 
+/**
+ * GET /api/books query parameters.
+ *
+ * Coerces strings to numbers because URL search params arrive as strings.
+ * All filters are optional; missing = no filter applied.
+ */
+export const listBooksQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+  title: z.string().min(1).max(500).optional(),
+  author: z.string().min(1).max(500).optional(),
+});
+
 export type CreateBookInput = z.infer<typeof createBookSchema>;
 export type UpdateBookInput = z.infer<typeof updateBookSchema>;
+export type ListBooksQuery = z.infer<typeof listBooksQuerySchema>;
