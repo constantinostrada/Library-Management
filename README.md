@@ -130,6 +130,12 @@ library-management/
 │   │       ├── helpers/
 │   │       └── validators/
 │   │
+│   ├── components/            # Shared presentational React components
+│   │                          #   (e.g. TailwindTest) — pure UI, no business logic
+│   │
+│   ├── lib/                   # Cross-cutting utilities (e.g. cn() class merger)
+│   │                          #   — framework-agnostic helpers shared across layers
+│   │
 │   └── app/                   # Next.js App Router
 │       ├── api/               # Route handlers (call use cases)
 │       ├── books/             # UI pages
