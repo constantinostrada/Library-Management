@@ -38,10 +38,18 @@ export interface UpdateBookDTO {
   totalCopies?: number;
 }
 
-/** Inbound — pagination parameters for listing books. */
+/** Inbound — pagination + optional filter parameters for listing books. */
 export interface ListBooksDTO {
   page?: number;
   limit?: number;
+  title?: string;
+  author?: string;
+}
+
+/** Filter criteria forwarded to the repository layer. */
+export interface BookFilters {
+  title?: string;
+  author?: string;
 }
 
 /** Outbound — paginated response wrapper. */

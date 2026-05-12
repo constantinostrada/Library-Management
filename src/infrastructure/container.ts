@@ -13,9 +13,11 @@
 import { LoanEligibilityService } from '@/domain/services/LoanEligibilityService';
 
 import { AddBookUseCase } from '@/application/use-cases/book/AddBookUseCase';
+import { DeleteBookUseCase } from '@/application/use-cases/book/DeleteBookUseCase';
 import { GetBookUseCase } from '@/application/use-cases/book/GetBookUseCase';
 import { ListBooksUseCase } from '@/application/use-cases/book/ListBooksUseCase';
 import { SearchBooksUseCase } from '@/application/use-cases/book/SearchBooksUseCase';
+import { UpdateBookUseCase } from '@/application/use-cases/book/UpdateBookUseCase';
 import { BorrowBookUseCase } from '@/application/use-cases/loan/BorrowBookUseCase';
 import { ListLoansUseCase } from '@/application/use-cases/loan/ListLoansUseCase';
 import { ReturnBookUseCase } from '@/application/use-cases/loan/ReturnBookUseCase';
@@ -42,6 +44,8 @@ export const addBookUseCase = new AddBookUseCase(bookRepository);
 export const getBookUseCase = new GetBookUseCase(bookRepository);
 export const listBooksUseCase = new ListBooksUseCase(bookRepository);
 export const searchBooksUseCase = new SearchBooksUseCase(bookRepository);
+export const updateBookUseCase = new UpdateBookUseCase(bookRepository);
+export const deleteBookUseCase = new DeleteBookUseCase(bookRepository, loanRepository);
 
 // ── Member Use Cases ───────────────────────────────────────────────────────────
 export const registerMemberUseCase = new RegisterMemberUseCase(memberRepository);

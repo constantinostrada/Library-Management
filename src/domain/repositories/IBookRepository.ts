@@ -1,5 +1,10 @@
 import { Book } from '../entities/Book';
 
+export interface BookFilterCriteria {
+  title?: string;
+  author?: string;
+}
+
 /**
  * Repository Interface: IBookRepository
  *
@@ -16,11 +21,17 @@ export interface IBookRepository {
   findByIsbn(isbn: string): Promise<Book | null>;
 
   /**
-   * Returns a paginated list of all books.
-   * @param page  1-based page number.
-   * @param limit Items per page.
+   * Returns a paginated list of books, optionally filtered by title/author.
+   * Filters are applied as case-insensitive substring matches.
+   * @param page    1-based page number.
+   * @param limit   Items per page.
+   * @param filters Optional filter criteria.
    */
-  findAll(page: number, limit: number): Promise<{ books: Book[]; total: number }>;
+  findAll(
+    page: number,
+    limit: number,
+    filters?: BookFilterCriteria,
+  ): Promise<{ books: Book[]; total: number }>;
 
   /**
    * Full-text search across title and author fields.

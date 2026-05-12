@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 import { Book } from '@/domain/entities/Book';
-import { IBookRepository } from '@/domain/repositories/IBookRepository';
+import { BookFilterCriteria, IBookRepository } from '@/domain/repositories/IBookRepository';
 
 /**
  * Infrastructure: PrismaBookRepository
@@ -41,17 +41,31 @@ export class PrismaBookRepository implements IBookRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async findAll(page: number, limit: number): Promise<{ books: Book[]; total: number }> {
+  async findAll(
+    page: number,
+    limit: number,
+    filters: BookFilterCriteria = {},
+  ): Promise<{ books: Book[]; total: number }> {
     const skip = (page - 1) * limit;
+
+    const where = {
+      ...(filters.title
+        ? { title: { contains: filters.title, mode: 'insensitive' as const } }
+        : {}),
+      ...(filters.author
+        ? { author: { contains: filters.author, mode: 'insensitive' as const } }
+        : {}),
+    };
 
     const [rows, total] = await this.db.$transaction([
       this.db.book.findMany({
+        where,
         skip,
         take: limit,
         orderBy: { title: 'asc' },
         include: { _count: { select: { loans: { where: { status: { in: ['ACTIVE', 'OVERDUE'] } } } } } },
       }),
-      this.db.book.count(),
+      this.db.book.count({ where }),
     ]);
 
     return { books: rows.map((r) => this.toDomain(r)), total };

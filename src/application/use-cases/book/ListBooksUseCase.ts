@@ -18,7 +18,12 @@ export class ListBooksUseCase {
     const page = Math.max(1, dto.page ?? DEFAULT_PAGE);
     const limit = Math.min(100, Math.max(1, dto.limit ?? DEFAULT_LIMIT));
 
-    const { books, total } = await this.bookRepository.findAll(page, limit);
+    const filters = {
+      ...(dto.title?.trim() ? { title: dto.title.trim() } : {}),
+      ...(dto.author?.trim() ? { author: dto.author.trim() } : {}),
+    };
+
+    const { books, total } = await this.bookRepository.findAll(page, limit, filters);
 
     return {
       books: BookMapper.toDTOList(books),

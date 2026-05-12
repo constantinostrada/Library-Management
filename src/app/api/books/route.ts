@@ -1,36 +1,44 @@
 import { NextRequest } from 'next/server';
 
-import { listBooksUseCase, addBookUseCase, searchBooksUseCase } from '@/infrastructure/container';
+import { addBookUseCase, listBooksUseCase } from '@/infrastructure/container';
 import {
   created,
   errorResponse,
   handleError,
   ok,
 } from '@/interfaces/http/helpers/apiResponse';
-import { parsePaginationQuery, parseStringQuery } from '@/interfaces/http/helpers/parseQuery';
-import { createBookSchema } from '@/interfaces/http/validators/bookValidators';
+import {
+  createBookSchema,
+  listBooksQuerySchema,
+} from '@/interfaces/http/validators/bookValidators';
 
 /**
  * GET /api/books
  *
- * Returns a paginated list of books, or search results when ?q= is provided.
+ * Returns a paginated list of books, with optional case-insensitive
+ * substring filters for `title` and `author`.
  *
  * Query params:
- *   q     - search term (title or author)
- *   page  - 1-based page number (default: 1)
- *   limit - items per page (default: 20, max: 100)
+ *   page   - 1-based page number (default: 1)
+ *   limit  - items per page (default: 20, max: 100)
+ *   title  - filter by title substring (optional)
+ *   author - filter by author substring (optional)
  */
 export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const searchQuery = parseStringQuery(request.url, 'q');
+    const { searchParams } = new URL(request.url);
+    const parsed = listBooksQuerySchema.safeParse({
+      page: searchParams.get('page') ?? undefined,
+      limit: searchParams.get('limit') ?? undefined,
+      title: searchParams.get('title') ?? undefined,
+      author: searchParams.get('author') ?? undefined,
+    });
 
-    if (searchQuery) {
-      const books = await searchBooksUseCase.execute({ query: searchQuery });
-      return ok(books);
+    if (!parsed.success) {
+      return errorResponse(parsed.error.errors.map((e) => e.message).join('; '), 422);
     }
 
-    const { page, limit } = parsePaginationQuery(request.url);
-    const result = await listBooksUseCase.execute({ page, limit });
+    const result = await listBooksUseCase.execute(parsed.data);
     return ok(result);
   } catch (error) {
     return handleError(error);
