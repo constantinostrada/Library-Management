@@ -28,6 +28,14 @@ export class PrismaLoanRepository implements ILoanRepository {
     return rows.map((r) => this.toDomain(r));
   }
 
+  async findLoansByMemberId(memberId: string): Promise<Loan[]> {
+    const rows = await this.db.loan.findMany({
+      where: { memberId },
+      orderBy: { borrowedAt: 'desc' },
+    });
+    return rows.map((r) => this.toDomain(r));
+  }
+
   async findLoansByBookId(bookId: string): Promise<Loan[]> {
     const rows = await this.db.loan.findMany({
       where: { bookId },

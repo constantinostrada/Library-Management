@@ -7,22 +7,35 @@ import {
   handleError,
   ok,
 } from '@/interfaces/http/helpers/apiResponse';
-import { parsePaginationQuery } from '@/interfaces/http/helpers/parseQuery';
-import { createMemberSchema } from '@/interfaces/http/validators/memberValidators';
+import {
+  createMemberSchema,
+  listMembersQuerySchema,
+} from '@/interfaces/http/validators/memberValidators';
 
 /**
  * GET /api/members
  *
- * Returns a paginated list of all registered members.
+ * Returns a paginated list of registered members, optionally filtered by status.
  *
  * Query params:
- *   page  - 1-based page number (default: 1)
- *   limit - items per page (default: 20, max: 100)
+ *   page   - 1-based page number (default: 1)
+ *   limit  - items per page (default: 20, max: 100)
+ *   status - ACTIVE | SUSPENDED | CLOSED (optional)
  */
 export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { page, limit } = parsePaginationQuery(request.url);
-    const result = await listMembersUseCase.execute({ page, limit });
+    const { searchParams } = new URL(request.url);
+    const parsed = listMembersQuerySchema.safeParse({
+      page: searchParams.get('page') ?? undefined,
+      limit: searchParams.get('limit') ?? undefined,
+      status: searchParams.get('status') ?? undefined,
+    });
+
+    if (!parsed.success) {
+      return errorResponse(parsed.error.errors.map((e) => e.message).join('; '), 422);
+    }
+
+    const result = await listMembersUseCase.execute(parsed.data);
     return ok(result);
   } catch (error) {
     return handleError(error);
@@ -32,7 +45,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 /**
  * POST /api/members
  *
- * Registers a new library member.
+ * Registers a new library member. Email uniqueness is enforced by the use case.
  *
  * Body: { email, name }
  */

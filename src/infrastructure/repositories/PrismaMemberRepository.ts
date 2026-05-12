@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 
 import { Member, MemberStatus } from '@/domain/entities/Member';
-import { IMemberRepository } from '@/domain/repositories/IMemberRepository';
+import { IMemberRepository, MemberFilterCriteria } from '@/domain/repositories/IMemberRepository';
 
 /**
  * Infrastructure: PrismaMemberRepository
@@ -25,16 +25,22 @@ export class PrismaMemberRepository implements IMemberRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async findAll(page: number, limit: number): Promise<{ members: Member[]; total: number }> {
+  async findAll(
+    page: number,
+    limit: number,
+    filters?: MemberFilterCriteria,
+  ): Promise<{ members: Member[]; total: number }> {
     const skip = (page - 1) * limit;
+    const where = filters?.status ? { status: filters.status } : undefined;
 
     const [rows, total] = await this.db.$transaction([
       this.db.member.findMany({
+        where,
         skip,
         take: limit,
         orderBy: { name: 'asc' },
       }),
-      this.db.member.count(),
+      this.db.member.count({ where }),
     ]);
 
     return { members: rows.map((r) => this.toDomain(r)), total };

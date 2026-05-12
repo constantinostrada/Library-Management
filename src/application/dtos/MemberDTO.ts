@@ -24,13 +24,15 @@ export interface CreateMemberDTO {
 export interface UpdateMemberDTO {
   id: string;
   name?: string;
+  email?: string;
   status?: MemberStatusDTO;
 }
 
-/** Inbound — pagination parameters. */
+/** Inbound — pagination + filter parameters. */
 export interface ListMembersDTO {
   page?: number;
   limit?: number;
+  status?: MemberStatusDTO;
 }
 
 /** Outbound — paginated response. */

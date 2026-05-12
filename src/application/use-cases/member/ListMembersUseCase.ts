@@ -18,7 +18,9 @@ export class ListMembersUseCase {
     const page = Math.max(1, dto.page ?? DEFAULT_PAGE);
     const limit = Math.min(100, Math.max(1, dto.limit ?? DEFAULT_LIMIT));
 
-    const { members, total } = await this.memberRepository.findAll(page, limit);
+    const filters = dto.status ? { status: dto.status } : undefined;
+
+    const { members, total } = await this.memberRepository.findAll(page, limit, filters);
 
     return {
       members: MemberMapper.toDTOList(members),

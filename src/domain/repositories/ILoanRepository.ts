@@ -12,6 +12,9 @@ export interface ILoanRepository {
   /** Returns all active (non-returned) loans for a given member. */
   findActiveLoansByMemberId(memberId: string): Promise<Loan[]>;
 
+  /** Returns the full loan history (active + returned + overdue) for a given member, newest first. */
+  findLoansByMemberId(memberId: string): Promise<Loan[]>;
+
   /** Returns all loans (active and returned) for a given book. */
   findLoansByBookId(bookId: string): Promise<Loan[]>;
 
