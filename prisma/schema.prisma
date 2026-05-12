@@ -28,6 +28,8 @@ model Book {
 
   loans Loan[]
 
+  @@index([title])
+  @@index([author])
   @@map("books")
 }
 
@@ -43,6 +45,8 @@ model Member {
 
   loans Loan[]
 
+  @@index([status])
+  @@index([name])
   @@map("members")
 }
 
@@ -63,9 +67,14 @@ model Loan {
   returnedAt DateTime?
   status     LoanStatus @default(ACTIVE)
 
-  book   Book   @relation(fields: [bookId], references: [id])
-  member Member @relation(fields: [memberId], references: [id])
+  book   Book   @relation(fields: [bookId], references: [id], onDelete: Restrict)
+  member Member @relation(fields: [memberId], references: [id], onDelete: Restrict)
 
+  @@index([bookId])
+  @@index([memberId])
+  @@index([status])
+  @@index([dueAt])
+  @@index([memberId, status])
   @@map("loans")
 }
 
