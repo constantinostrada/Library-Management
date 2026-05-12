@@ -82,8 +82,15 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/library_management?s
 # Run migrations (creates the schema in your PostgreSQL database)
 npm run db:migrate
 
-# (Optional) Seed the database with sample data
+# Seed the database with sample data (6 books, 4 members, 3 active loans)
 npm run db:seed
+```
+
+To wipe the database and re-run all migrations + seeds in one shot (useful when
+something gets into a bad state):
+
+```bash
+npm run db:reset
 ```
 
 ### 4. Start the development server
