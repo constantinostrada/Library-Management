@@ -19,6 +19,7 @@ import { ListBooksUseCase } from '@/application/use-cases/book/ListBooksUseCase'
 import { SearchBooksUseCase } from '@/application/use-cases/book/SearchBooksUseCase';
 import { UpdateBookUseCase } from '@/application/use-cases/book/UpdateBookUseCase';
 import { BorrowBookUseCase } from '@/application/use-cases/loan/BorrowBookUseCase';
+import { CountActiveLoansByMemberUseCase } from '@/application/use-cases/loan/CountActiveLoansByMemberUseCase';
 import { ListLoansUseCase } from '@/application/use-cases/loan/ListLoansUseCase';
 import { ReturnBookUseCase } from '@/application/use-cases/loan/ReturnBookUseCase';
 import { GetMemberLoansUseCase } from '@/application/use-cases/member/GetMemberLoansUseCase';
@@ -65,3 +66,4 @@ export const borrowBookUseCase = new BorrowBookUseCase(
 );
 export const returnBookUseCase = new ReturnBookUseCase(loanRepository, bookRepository);
 export const listLoansUseCase = new ListLoansUseCase(loanRepository);
+export const countActiveLoansByMemberUseCase = new CountActiveLoansByMemberUseCase(loanRepository);
