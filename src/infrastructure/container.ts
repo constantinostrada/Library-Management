@@ -19,6 +19,7 @@ import { ListBooksUseCase } from '@/application/use-cases/book/ListBooksUseCase'
 import { SearchBooksUseCase } from '@/application/use-cases/book/SearchBooksUseCase';
 import { UpdateBookUseCase } from '@/application/use-cases/book/UpdateBookUseCase';
 import { BorrowBookUseCase } from '@/application/use-cases/loan/BorrowBookUseCase';
+import { CanBorrowUseCase } from '@/application/use-cases/loan/CanBorrowUseCase';
 import { CountActiveLoansByMemberUseCase } from '@/application/use-cases/loan/CountActiveLoansByMemberUseCase';
 import { ListLoansUseCase } from '@/application/use-cases/loan/ListLoansUseCase';
 import { ReturnBookUseCase } from '@/application/use-cases/loan/ReturnBookUseCase';
@@ -39,8 +40,11 @@ const memberRepository = new PrismaMemberRepository(prisma);
 const loanRepository = new PrismaLoanRepository(prisma);
 
 // ── Domain Services ────────────────────────────────────────────────────────────
-const maxBooksPerMember = parseInt(process.env.MAX_BOOKS_PER_MEMBER ?? '5', 10);
-const eligibilityService = new LoanEligibilityService(maxBooksPerMember);
+// BORROW_LIMIT controls the max concurrent active loans per member (default 3).
+const parsedBorrowLimit = parseInt(process.env.BORROW_LIMIT ?? '3', 10);
+const borrowLimit =
+  Number.isInteger(parsedBorrowLimit) && parsedBorrowLimit > 0 ? parsedBorrowLimit : 3;
+const eligibilityService = new LoanEligibilityService(borrowLimit);
 
 // ── Book Use Cases ─────────────────────────────────────────────────────────────
 export const addBookUseCase = new AddBookUseCase(bookRepository);
@@ -67,3 +71,9 @@ export const borrowBookUseCase = new BorrowBookUseCase(
 export const returnBookUseCase = new ReturnBookUseCase(loanRepository, bookRepository);
 export const listLoansUseCase = new ListLoansUseCase(loanRepository);
 export const countActiveLoansByMemberUseCase = new CountActiveLoansByMemberUseCase(loanRepository);
+export const canBorrowUseCase = new CanBorrowUseCase(
+  bookRepository,
+  memberRepository,
+  loanRepository,
+  eligibilityService,
+);
