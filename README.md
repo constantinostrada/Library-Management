@@ -248,9 +248,17 @@ All responses follow the envelope pattern:
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/loans` | List all loans (paginated) |
+| `GET` | `/api/loans` | List loans (filters: `status`, `memberId`) |
 | `POST` | `/api/loans` | Borrow a book |
-| `POST` | `/api/loans/return` | Return a book |
+| `PUT` | `/api/loans/:id/return` | Return a book |
+
+**GET /api/loans query params:**
+- `page`, `limit` — pagination (defaults: 1 / 20, max limit 100)
+- `status` — `active` | `returned` | `overdue` (case-insensitive)
+- `memberId` — UUID of the member
+
+Each loan in the response carries an `isOverdue` boolean computed from
+`dueAt < today AND returnedAt === null`.
 
 **POST /api/loans body:**
 ```json
@@ -261,10 +269,9 @@ All responses follow the envelope pattern:
 }
 ```
 
-**POST /api/loans/return body:**
-```json
-{ "loanId": "uuid" }
-```
+`loanDurationDays` is optional and defaults to 14 days.
+
+**PUT /api/loans/:id/return:** no body; `id` is the loan UUID in the URL.
 
 ---
 

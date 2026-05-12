@@ -106,9 +106,9 @@ export default function HomePage(): JSX.Element {
                 ['GET', '/api/members', 'List members'],
                 ['POST', '/api/members', 'Register a new member'],
                 ['GET', '/api/members/:id', 'Get a member by ID'],
-                ['GET', '/api/loans', 'List all loans'],
+                ['GET', '/api/loans', 'List loans (filters: status, memberId)'],
                 ['POST', '/api/loans', 'Borrow a book'],
-                ['POST', '/api/loans/return', 'Return a book'],
+                ['PUT', '/api/loans/:id/return', 'Return a book'],
               ].map(([method, path, desc]) => (
                 <tr key={path + method} className="text-gray-700">
                   <td className="py-2 pr-8">

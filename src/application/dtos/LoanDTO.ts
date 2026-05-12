@@ -4,6 +4,9 @@
 
 export type LoanStatusDTO = 'ACTIVE' | 'RETURNED' | 'OVERDUE';
 
+/** Logical filter for listing loans (matches the GET /api/loans query schema). */
+export type LoanStatusFilterDTO = 'active' | 'returned' | 'overdue';
+
 /** Outbound — shape returned by use cases. */
 export interface LoanDTO {
   id: string;
@@ -13,6 +16,8 @@ export interface LoanDTO {
   dueAt: string; // ISO 8601
   returnedAt: string | null; // ISO 8601 or null
   status: LoanStatusDTO;
+  /** True if not returned and dueAt has passed as of the snapshot's reference date. */
+  isOverdue: boolean;
 }
 
 /** Inbound — data required to create a new loan (borrow a book). */
@@ -28,10 +33,12 @@ export interface ReturnBookDTO {
   loanId: string;
 }
 
-/** Inbound — pagination parameters. */
+/** Inbound — pagination + filter parameters for listing loans. */
 export interface ListLoansDTO {
   page?: number;
   limit?: number;
+  memberId?: string;
+  status?: LoanStatusFilterDTO;
 }
 
 /** Outbound — paginated response. */

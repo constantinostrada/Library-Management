@@ -7,22 +7,38 @@ import {
   handleError,
   ok,
 } from '@/interfaces/http/helpers/apiResponse';
-import { parsePaginationQuery } from '@/interfaces/http/helpers/parseQuery';
-import { borrowBookSchema } from '@/interfaces/http/validators/loanValidators';
+import {
+  borrowBookSchema,
+  listLoansQuerySchema,
+} from '@/interfaces/http/validators/loanValidators';
 
 /**
  * GET /api/loans
  *
- * Returns a paginated list of all loans.
+ * Returns a paginated list of loans with optional filters.
+ * Each loan exposes `isOverdue` computed against the current date.
  *
  * Query params:
- *   page  - 1-based page number (default: 1)
- *   limit - items per page (default: 20, max: 100)
+ *   page     - 1-based page number (default: 1)
+ *   limit    - items per page (default: 20, max: 100)
+ *   status   - logical filter: active | returned | overdue (case-insensitive)
+ *   memberId - filter by member UUID
  */
 export async function GET(request: NextRequest): Promise<Response> {
   try {
-    const { page, limit } = parsePaginationQuery(request.url);
-    const result = await listLoansUseCase.execute({ page, limit });
+    const { searchParams } = new URL(request.url);
+    const parsed = listLoansQuerySchema.safeParse({
+      page: searchParams.get('page') ?? undefined,
+      limit: searchParams.get('limit') ?? undefined,
+      status: searchParams.get('status') ?? undefined,
+      memberId: searchParams.get('memberId') ?? undefined,
+    });
+
+    if (!parsed.success) {
+      return errorResponse(parsed.error.errors.map((e) => e.message).join('; '), 422);
+    }
+
+    const result = await listLoansUseCase.execute(parsed.data);
     return ok(result);
   } catch (error) {
     return handleError(error);
@@ -32,9 +48,13 @@ export async function GET(request: NextRequest): Promise<Response> {
 /**
  * POST /api/loans
  *
- * Creates a new loan (a member borrows a book).
+ * Creates a new loan (a member borrows a book). Business rules
+ * (eligibility, copy availability, borrow limit, member status) are
+ * enforced by the use case and surfaced as descriptive HTTP errors via
+ * the shared `handleError` mapper.
  *
  * Body: { bookId, memberId, loanDurationDays? }
+ * The optional `loanDurationDays` defaults to 14 (LoanDuration.default()).
  */
 export async function POST(request: NextRequest): Promise<Response> {
   try {
