@@ -42,13 +42,22 @@ export default async function BookDetailPage({ params }: Props): Promise<JSX.Ele
           <h1 className="text-2xl font-bold text-gray-900" data-testid="detail-title">
             {book.title}
           </h1>
-          <span
-            className={badgeClass}
-            data-testid="detail-availability-badge"
-            aria-label={`${book.availableCopies} of ${book.totalCopies} copies available`}
-          >
-            {book.availableCopies} / {book.totalCopies} available
-          </span>
+          <div className="flex items-center gap-3">
+            <a
+              href={`/books/${book.id}/edit`}
+              data-testid="detail-edit-link"
+              className="btn-secondary"
+            >
+              Edit
+            </a>
+            <span
+              className={badgeClass}
+              data-testid="detail-availability-badge"
+              aria-label={`${book.availableCopies} of ${book.totalCopies} copies available`}
+            >
+              {book.availableCopies} / {book.totalCopies} available
+            </span>
+          </div>
         </div>
 
         <dl className="grid grid-cols-2 gap-4 text-sm">
