@@ -1,4 +1,9 @@
-import { Member } from '../entities/Member';
+import { Member, MemberStatus } from '../entities/Member';
+
+/** Optional filters applied to the paginated `findAll` query. */
+export interface MemberFilterCriteria {
+  status?: MemberStatus;
+}
 
 /**
  * Repository Interface: IMemberRepository
@@ -13,11 +18,16 @@ export interface IMemberRepository {
   findByEmail(email: string): Promise<Member | null>;
 
   /**
-   * Returns a paginated list of all members.
-   * @param page  1-based page number.
-   * @param limit Items per page.
+   * Returns a paginated list of members, optionally filtered by status.
+   * @param page    1-based page number.
+   * @param limit   Items per page.
+   * @param filters Optional filter criteria.
    */
-  findAll(page: number, limit: number): Promise<{ members: Member[]; total: number }>;
+  findAll(
+    page: number,
+    limit: number,
+    filters?: MemberFilterCriteria,
+  ): Promise<{ members: Member[]; total: number }>;
 
   /** Persists a new member. Returns the created member. */
   create(member: Member): Promise<Member>;

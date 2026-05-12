@@ -58,6 +58,7 @@ const makeLoanRepo = (loans: Loan[]): jest.Mocked<ILoanRepository> =>
   ({
     findById: jest.fn(),
     findActiveLoansByMemberId: jest.fn(),
+    findLoansByMemberId: jest.fn().mockResolvedValue([]),
     findLoansByBookId: jest.fn().mockResolvedValue(loans),
     findOverdueLoans: jest.fn(),
     findAll: jest.fn(),

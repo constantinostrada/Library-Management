@@ -21,9 +21,11 @@ import { UpdateBookUseCase } from '@/application/use-cases/book/UpdateBookUseCas
 import { BorrowBookUseCase } from '@/application/use-cases/loan/BorrowBookUseCase';
 import { ListLoansUseCase } from '@/application/use-cases/loan/ListLoansUseCase';
 import { ReturnBookUseCase } from '@/application/use-cases/loan/ReturnBookUseCase';
+import { GetMemberLoansUseCase } from '@/application/use-cases/member/GetMemberLoansUseCase';
 import { GetMemberUseCase } from '@/application/use-cases/member/GetMemberUseCase';
 import { ListMembersUseCase } from '@/application/use-cases/member/ListMembersUseCase';
 import { RegisterMemberUseCase } from '@/application/use-cases/member/RegisterMemberUseCase';
+import { UpdateMemberUseCase } from '@/application/use-cases/member/UpdateMemberUseCase';
 
 import { prisma } from './database/prismaClient';
 import { PrismaBookRepository } from './repositories/PrismaBookRepository';
@@ -51,6 +53,8 @@ export const deleteBookUseCase = new DeleteBookUseCase(bookRepository, loanRepos
 export const registerMemberUseCase = new RegisterMemberUseCase(memberRepository);
 export const getMemberUseCase = new GetMemberUseCase(memberRepository);
 export const listMembersUseCase = new ListMembersUseCase(memberRepository);
+export const updateMemberUseCase = new UpdateMemberUseCase(memberRepository);
+export const getMemberLoansUseCase = new GetMemberLoansUseCase(memberRepository, loanRepository);
 
 // ── Loan Use Cases ─────────────────────────────────────────────────────────────
 export const borrowBookUseCase = new BorrowBookUseCase(
