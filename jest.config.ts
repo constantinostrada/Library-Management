@@ -11,7 +11,12 @@ const config: Config = {
     '^@/interfaces/(.*)$': '<rootDir>/src/interfaces/$1',
     '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testMatch: ['**/__tests__/**/*.test.ts', '**/*.test.ts'],
+  testMatch: [
+    '**/__tests__/**/*.test.ts',
+    '**/__tests__/**/*.test.tsx',
+    '**/*.test.ts',
+    '**/*.test.tsx',
+  ],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
@@ -21,7 +26,15 @@ const config: Config = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { tsconfig: { module: 'commonjs' } }],
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          module: 'commonjs',
+          jsx: 'react-jsx',
+        },
+      },
+    ],
   },
 };
 
